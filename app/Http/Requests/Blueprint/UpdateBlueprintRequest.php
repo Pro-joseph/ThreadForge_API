@@ -19,7 +19,7 @@ class UpdateBlueprintRequest extends FormRequest
         'max_hashtags' => ['nullable', 'integer', 'min:0', 'max:30'],
         'tone' => ['sometimes', 'string', 'max:100'],
         'max_characters' => ['nullable', 'integer', 'min:1', 'max:10000'],
-    ];
+    ]; 
 
     }
 }
