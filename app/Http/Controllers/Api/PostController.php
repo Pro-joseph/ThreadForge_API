@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Post\UpdatePostStatusRequest;
 use App\Http\Resources\GeneratedPostResource;
+use App\Models\GeneratedPost;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -12,36 +13,33 @@ class PostController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $posts = $request->user()
-        ->generatedPosts()
-        ->with('campaignBlueprint')
-        ->latest()
-        ->paginate(15);
+        $this->authorize('viewAny', GeneratedPost::class);
 
-    return response()->json(GeneratedPostResource::collection($posts));
+        $posts = GeneratedPost::where('user_id', $request->user()->id)
+            ->with('campaignBlueprint')
+            ->latest()
+            ->paginate(15);
 
+        return response()->json(GeneratedPostResource::collection($posts));
     }
 
     public function show(string $id): JsonResponse
     {
-        $post = request()->user()
-        ->generatedPosts()
-        ->with('campaignBlueprint')
-        ->findOrFail($id);
+        $post = GeneratedPost::with('campaignBlueprint')->findOrFail($id);
 
-    return response()->json(new GeneratedPostResource($post));
+        $this->authorize('view', $post);
 
+        return response()->json(new GeneratedPostResource($post));
     }
 
     public function updateStatus(UpdatePostStatusRequest $request, string $id): JsonResponse
     {
-        $post = request()->user()
-        ->generatedPosts()
-        ->findOrFail($id);
+        $post = GeneratedPost::findOrFail($id);
 
-    $post->update(['status' => $request->status]);
+        $this->authorize('update', $post);
 
-    return response()->json(new GeneratedPostResource($post));
+        $post->update(['status' => $request->status]);
 
+        return response()->json(new GeneratedPostResource($post));
     }
 }
