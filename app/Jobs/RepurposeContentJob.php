@@ -2,8 +2,11 @@
 
 namespace App\Jobs;
 
+use App\Models\GeneratedPost;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+
+use function Laravel\Ai\agent;
 
 class RepurposeContentJob implements ShouldQueue
 {
@@ -18,31 +21,26 @@ class RepurposeContentJob implements ShouldQueue
         public int $campaignBlueprintId,
     ) {}
 
-
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-            $response = ai()->provider('groq')->chat()->create(
-            messages: [
-                ['role' => 'user', 'content' => "Transform this raw content into a social media post following the rules. Return JSON with hook_propose (max 280 chars), body_points (array of strings), technicalreadabilityscore (0-100), suggested_hashtags (array of strings), tonecompliancejustification (string).\n\nRaw content:\n" . $this->rawContent],
-            ],
-            options: ['model' => 'llama-3.3-70b-versatile'],
-            schema: [
-                'type' => 'object',
-                'properties' => [
-                    'hook_propose' => ['type' => 'string'],
-                    'body_points' => ['type' => 'array', 'items' => ['type' => 'string']],
-                    'technicalreadabilityscore' => ['type' => 'integer'],
-                    'suggested_hashtags' => ['type' => 'array', 'items' => ['type' => 'string']],
-                    'tonecompliancejustification' => ['type' => 'string'],
-                ],
-                'required' => ['hook_propose', 'body_points', 'technicalreadabilityscore', 'suggested_hashtags', 'tonecompliancejustification'],
-            ],
+        $response = agent(
+            instructions: 'You are a social media content transformer. Transform raw content into a structured post.',
+            schema: fn($schema) => [
+                'hook_propose' => $schema->string()->required(),
+                'body_points' => $schema->array()->items($schema->string())->required(),
+                'technicalreadabilityscore' => $schema->integer()->required(),
+                'suggested_hashtags' => $schema->array()->items($schema->string())->required(),
+                'tonecompliancejustification' => $schema->string()->required(),
+            ])->prompt(
+            prompt: "Transform this content:\n\n".$this->rawContent,
+            provider: 'groq',
+            model: 'openai/gpt-oss-20b',
         );
 
-        $data = $response->data;
+        $data = $response->toArray();
 
         GeneratedPost::create([
             'user_id' => $this->userId,
@@ -57,4 +55,3 @@ class RepurposeContentJob implements ShouldQueue
         ]);
     }
 }
-    
