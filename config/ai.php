@@ -141,5 +141,11 @@ return [
             'key' => env('XAI_API_KEY'),
         ],
     ],
+    'conversations' => [
+    'tables' => [
+        'conversations' => 'agent_conversations',
+        'messages' => 'agent_conversation_messages',
+    ],
+],
 
 ];

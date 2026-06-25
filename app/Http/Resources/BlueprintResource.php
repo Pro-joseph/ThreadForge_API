@@ -20,6 +20,6 @@ class BlueprintResource extends JsonResource
         'posts_count' => $this->whenCounted('generatedPosts'),
         'created_at' => $this->created_at,
         'updated_at' => $this->updated_at,
-    ];
+    ]; 
     }
 }

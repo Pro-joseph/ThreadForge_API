@@ -12,7 +12,7 @@ class StoreBlueprintRequest extends FormRequest
     }
 
     public function rules(): array
-    {
+    { 
         return [
         'name' => ['required', 'string', 'max:100'],
         'target_audience' => ['nullable', 'string', 'max:255'],
