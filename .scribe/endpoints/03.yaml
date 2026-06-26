@@ -1,0 +1,94 @@
+name: 'Content Repurposing'
+description: |-
+
+  Transform raw notes into structured social media posts via AI.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/content/repurpose
+    metadata:
+      custom: []
+      groupName: 'Content Repurposing'
+      groupDescription: |-
+
+        Transform raw notes into structured social media posts via AI.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Repurpose content'
+      description: |-
+        Submit raw content for AI processing. The content will be transformed into a structured post
+        based on the selected campaign blueprint's rules. Processing happens asynchronously via a queue.
+        Check the generated posts endpoint for results.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      raw_content:
+        custom: []
+        name: raw_content
+        description: 'The raw notes or content to transform.'
+        required: true
+        example: 'PHP 8.4 introduced property hooks for computed properties.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      campaign_blueprint_id:
+        custom: []
+        name: campaign_blueprint_id
+        description: 'The ID of the campaign blueprint whose rules to follow.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      raw_content: 'PHP 8.4 introduced property hooks for computed properties.'
+      campaign_blueprint_id: 1
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 202
+        content: |-
+          {
+            "message": "Content submitted for processing"
+          }
+        headers: []
+        description: submitted
+      -
+        custom: []
+        status: 403
+        content: '{ "message": "This action is unauthorized." }'
+        headers: []
+        description: unauthorized
+      -
+        custom: []
+        status: 422
+        content: |-
+          {
+            "message": "The raw_content field is required.",
+            "errors": { "raw_content": ["The raw_content field is required."] }
+          }
+        headers: []
+        description: 'validation error'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null

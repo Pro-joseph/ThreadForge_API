@@ -1,20 +1,21 @@
-# API Test Formats
+# API Test Formats (JSON)
 
-## Register
+## Auth
 
-```bash
-curl -X POST http://localhost:8000/api/register \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
-  -d '{
-    "name": "Your Name",
-    "email": "you@example.com",
-    "password": "password123",
-    "password_confirmation": "password123"
-  }'
+### Register
+```json
+POST http://localhost:8000/api/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Your Name",
+  "email": "you@example.com",
+  "password": "password123",
+  "password_confirmation": "password123"
+}
 ```
-
-**Response** `201`:
+→ `201`
 ```json
 {
   "user": { "id": 1, "name": "Your Name", "email": "you@example.com" },
@@ -22,21 +23,18 @@ curl -X POST http://localhost:8000/api/register \
 }
 ```
 
----
+### Login
+```json
+POST http://localhost:8000/api/login
+Content-Type: application/json
+Accept: application/json
 
-## Login
-
-```bash
-curl -X POST http://localhost:8000/api/login \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
-  -d '{
-    "email": "you@example.com",
-    "password": "password123"
-  }'
+{
+  "email": "you@example.com",
+  "password": "password123"
+}
 ```
-
-**Response** `200`:
+→ `200`
 ```json
 {
   "user": { "id": 1, "name": "Your Name", "email": "you@example.com" },
@@ -44,12 +42,15 @@ curl -X POST http://localhost:8000/api/login \
 }
 ```
 
-**Error** `422`:
+### Logout
 ```json
-{
-  "message": "The email field is required.",
-  "errors": { "email": ["The email field is required."] }
-}
+POST http://localhost:8000/api/logout
+Authorization: Bearer YOUR_TOKEN
+Accept: application/json
+```
+→ `200`
+```json
+{ "message": "Logged out" }
 ```
 
 ---
@@ -57,22 +58,21 @@ curl -X POST http://localhost:8000/api/login \
 ## Blueprints
 
 ### Create
+```json
+POST http://localhost:8000/api/blueprints
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+Accept: application/json
 
-```bash
-curl -X POST http://localhost:8000/api/blueprints \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
-  -d '{
-    "name": "Tech Thought Leader",
-    "target_audience": "Software developers",
-    "max_hashtags": 5,
-    "tone": "Professional but approachable",
-    "max_characters": 280
-  }'
+{
+  "name": "Tech Thought Leader",
+  "target_audience": "Software developers",
+  "max_hashtags": 5,
+  "tone": "Professional but approachable",
+  "max_characters": 280
+}
 ```
-
-**Response** `201`:
+→ `201`
 ```json
 {
   "id": 1,
@@ -87,14 +87,12 @@ curl -X POST http://localhost:8000/api/blueprints \
 ```
 
 ### List
-
-```bash
-curl http://localhost:8000/api/blueprints \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Accept: application/json"
+```json
+GET http://localhost:8000/api/blueprints
+Authorization: Bearer YOUR_TOKEN
+Accept: application/json
 ```
-
-**Response** `200`:
+→ `200`
 ```json
 [
   {
@@ -112,60 +110,133 @@ curl http://localhost:8000/api/blueprints \
 ```
 
 ### Show
-
-```bash
-curl http://localhost:8000/api/blueprints/1 \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Accept: application/json"
+```json
+GET http://localhost:8000/api/blueprints/1
+Authorization: Bearer YOUR_TOKEN
+Accept: application/json
 ```
+→ `200` (same shape as create response)
 
 ### Update
+```json
+PUT http://localhost:8000/api/blueprints/1
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+Accept: application/json
 
-```bash
-curl -X PUT http://localhost:8000/api/blueprints/1 \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
-  -d '{
-    "name": "Updated Blueprint",
-    "tone": "More casual"
-  }'
+{
+  "name": "Updated Name",
+  "tone": "More casual"
+}
 ```
+→ `200`
 
 ### Delete
-
-```bash
-curl -X DELETE http://localhost:8000/api/blueprints/1 \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Accept: application/json"
+```json
+DELETE http://localhost:8000/api/blueprints/1
+Authorization: Bearer YOUR_TOKEN
+Accept: application/json
 ```
-
-**Response** `204` (no body).
+→ `204` (no body)
 
 ---
 
-## Full Test Flow
+## Content
 
-```bash
-# 1. Register
-TOKEN=$(curl -s -X POST http://localhost:8000/api/register \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
-  -d '{"name":"Test","email":"t@t.com","password":"p","password_confirmation":"p"}' \
-  | python -c "import sys,json; print(json.load(sys.stdin)['token'])")
+### Repurpose
+```json
+POST http://localhost:8000/api/content/repurpose
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+Accept: application/json
 
-# 2. Create blueprint
-BP_ID=$(curl -s -X POST http://localhost:8000/api/blueprints \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
-  -d '{"name":"BP","target_audience":"Devs","max_hashtags":3,"tone":"Casual","max_characters":280}' \
-  | python -c "import sys,json; print(json.load(sys.stdin)['id'])")
+{
+  "raw_content": "PHP 8.4 introduced property hooks, letting you define computed properties with get/set logic inline.",
+  "campaign_blueprint_id": 1
+}
+```
+→ `202`
+```json
+{ "message": "Content submitted for processing" }
+```
 
-# 3. Repurpose content
-curl -s -X POST http://localhost:8000/api/content/repurpose \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
-  -d "{\"raw_content\":\"Your content here\",\"campaign_blueprint_id\":$BP_ID}"
+---
+
+## Posts
+
+### List
+```json
+GET http://localhost:8000/api/posts
+Authorization: Bearer YOUR_TOKEN
+Accept: application/json
+```
+→ `200`
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "campaign_blueprint_id": 1,
+      "raw_content": "PHP 8.4 introduced...",
+      "hook_propose": "New in PHP 8.4: Property Hooks!",
+      "body_points": ["Point 1", "Point 2"],
+      "technical_readability_score": 7,
+      "suggested_hashtags": ["#PHP84"],
+      "tone_compliance_justification": "Professional.",
+      "status": "draft",
+      "created_at": "2026-06-23T15:00:00.000000Z",
+      "updated_at": "2026-06-23T15:00:00.000000Z"
+    }
+  ],
+  "meta": { "current_page": 1, "last_page": 1, "total": 1 }
+}
+```
+
+### Show
+```json
+GET http://localhost:8000/api/posts/1
+Authorization: Bearer YOUR_TOKEN
+Accept: application/json
+```
+→ `200` (same shape as data item above, no wrapping)
+
+### Update status
+```json
+PUT http://localhost:8000/api/posts/1/status
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+Accept: application/json
+
+{ "status": "published" }
+```
+→ `200`
+
+### Chat
+```json
+POST http://localhost:8000/api/posts/1/chat
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+Accept: application/json
+
+{ "message": "Can you make the hook more engaging?" }
+```
+→ `200`
+```json
+{
+  "response": "Sure! How about: 'New in PHP 8.4: Property Hooks—Bye‑Bye Boilerplate!'",
+  "conversation_id": "019f0378-c588-7030-a451-182b5e798e38"
+}
+```
+
+### Chat (follow-up)
+```json
+POST http://localhost:8000/api/posts/1/chat
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+Accept: application/json
+
+{
+  "message": "Check the campaign rules too",
+  "conversation_id": "019f0378-c588-7030-a451-182b5e798e38"
+}
 ```

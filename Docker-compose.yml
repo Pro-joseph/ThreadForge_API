@@ -76,6 +76,19 @@ services:
     networks:
       - threadforge
 
+  webgrind:
+    build:
+      context: .
+      dockerfile: docker/webgrind/Dockerfile
+    container_name: threadforge_webgrind
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./storage/logs:/var/www/storage/logs:ro
+    networks:
+      - threadforge
+
 networks:
   threadforge:
     driver: bridge

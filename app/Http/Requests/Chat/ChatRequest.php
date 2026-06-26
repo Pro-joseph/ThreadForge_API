@@ -14,8 +14,8 @@ class ChatRequest extends FormRequest
     public function rules(): array
     {
         return [
-        'message' => ['required', 'string'],
-    ];
-
+            'message' => ['required', 'string'],
+            'conversation_id' => ['nullable', 'string'],
+        ];
     }
 }
