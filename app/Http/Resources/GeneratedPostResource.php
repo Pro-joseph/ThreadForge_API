@@ -11,6 +11,7 @@ class GeneratedPostResource extends JsonResource
     {
          return [
         'id' => $this->id,
+        'user_id' => $this->user_id,
         'campaign_blueprint_id' => $this->campaign_blueprint_id,
         'raw_content' => $this->raw_content,
         'hook_propose' => $this->hook_propose,

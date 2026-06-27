@@ -21,8 +21,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/content/repurpose', [ContentController::class, 'repurpose']);
 
     Route::get('/posts', [PostController::class, 'index']);
-    Route::get('/posts/{id}', [PostController::class, 'show']);
-    Route::put('/posts/{id}/status', [PostController::class, 'updateStatus']);
+    Route::get('/posts/{postId}', [PostController::class, 'show']);
+    Route::put('/posts/{postId}/status', [PostController::class, 'updateStatus']);
 
     Route::post('/posts/{postId}/chat', [ChatController::class, 'chat']);
 });

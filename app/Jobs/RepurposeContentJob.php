@@ -57,15 +57,21 @@ class RepurposeContentJob implements ShouldQueue
 
         $data = $response->toArray();
 
+        $required = ['hook_propose', 'technicalreadabilityscore', 'tonecompliancejustification'];
+        if ($missing = array_diff($required, array_keys($data))) {
+            Log::error('RepurposeContentJob: AI response missing keys', ['missing' => $missing, 'data' => $data]);
+            throw new \RuntimeException('AI response missing: '.implode(', ', $missing));
+        }
+
         GeneratedPost::create([
             'user_id' => $this->userId,
             'campaign_blueprint_id' => $this->campaignBlueprintId,
             'raw_content' => $this->rawContent,
-            'hook_propose' => $data['hook_propose'] ?? null,
+            'hook_propose' => $data['hook_propose'],
             'body_points' => $data['body_points'] ?? [],
-            'technical_readability_score' => $data['technicalreadabilityscore'] ?? null,
+            'technical_readability_score' => $data['technicalreadabilityscore'],
             'suggested_hashtags' => $data['suggested_hashtags'] ?? [],
-            'tone_compliance_justification' => $data['tonecompliancejustification'] ?? null,
+            'tone_compliance_justification' => $data['tonecompliancejustification'],
             'status' => 'draft',
         ]);
     }

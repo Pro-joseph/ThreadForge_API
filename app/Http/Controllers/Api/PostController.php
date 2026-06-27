@@ -54,7 +54,7 @@ class PostController extends Controller
      *   "meta": { "current_page": 1, "last_page": 1, "total": 1 }
      * }
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
         $this->authorize('viewAny', GeneratedPost::class);
 
@@ -63,7 +63,7 @@ class PostController extends Controller
             ->latest()
             ->paginate(15);
 
-        return response()->json(GeneratedPostResource::collection($posts));
+        return GeneratedPostResource::collection($posts);
     }
 
     /**
@@ -91,9 +91,9 @@ class PostController extends Controller
      * @response status=403 scenario="unauthorized" { "message": "This action is unauthorized." }
      * @response status=404 scenario="not found" { "message": "No query results..." }
      */
-    public function show(string $id): JsonResponse
+    public function show(string $postId): JsonResponse
     {
-        $post = GeneratedPost::with('campaignBlueprint')->findOrFail($id);
+        $post = GeneratedPost::with('campaignBlueprint')->findOrFail($postId);
 
         $this->authorize('view', $post);
 
@@ -122,9 +122,9 @@ class PostController extends Controller
      *   "errors": { "status": ["The selected status is invalid."] }
      * }
      */
-    public function updateStatus(UpdatePostStatusRequest $request, string $id): JsonResponse
+    public function updateStatus(UpdatePostStatusRequest $request, string $postId): JsonResponse
     {
-        $post = GeneratedPost::findOrFail($id);
+        $post = GeneratedPost::findOrFail($postId);
 
         $this->authorize('update', $post);
 
