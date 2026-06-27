@@ -9,6 +9,7 @@ use App\Models\GeneratedPost;
 use App\Tools\GetCampaignRules;
 use App\Tools\GetPostHistory;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @group Ghostwriter Chat
@@ -66,11 +67,22 @@ class ChatController extends Controller
             $agent->continue($request->conversation_id, $request->user());
         }
 
-        $response = $agent->prompt(
-            $request->message,
-            provider: 'groq',
-            model: 'openai/gpt-oss-20b',
-        );
+        try {
+            $response = $agent->prompt(
+                $request->message,
+                provider: 'groq',
+                model: 'openai/gpt-oss-20b',
+            );
+        } catch (\Throwable $e) {
+            Log::error('Chat AI call failed', [
+                'error' => $e->getMessage(),
+                'post_id' => $postId,
+                'user_id' => $request->user()->id,
+            ]);
+            return response()->json([
+                'message' => 'AI service is temporarily unavailable. Please try again.',
+            ], 503);
+        }
 
         return response()->json([
             'response' => $response->text,
