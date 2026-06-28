@@ -91,7 +91,7 @@ class ApiTest extends TestCase
 
         $delete = $this->deleteJson("/api/blueprints/{$id}", [], $headers);
         $delete->assertStatus(204);
-    }
+    } 
 
     public function test_blueprint_policy(): void
     {
