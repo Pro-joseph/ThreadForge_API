@@ -1,0 +1,45 @@
+name: Tests
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Installer PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, dom, fileinfo, mysql
+          coverage: none
+
+      - name: Copier le .env
+        run: cp .env.example .env
+
+      - name: Installer les dépendances Composer
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Générer la clé d'application
+        run: php artisan key:generate
+
+      - name: Lancer les tests
+        run: php artisan test
+
+
+
+# Explication ligne par ligne
+# on: push → déclenche le workflow à chaque push (sur n'importe quelle branche ici).
+# runs-on: ubuntu-latest → GitHub te fournit une machine virtuelle Linux fraîche à chaque run.
+# actions/checkout@v4 → récupère ton code sur cette machine (sans ça, il n'y a rien à tester).
+# shivammathur/setup-php@v2 → une action communautaire très utilisée qui installe PHP avec les extensions nécessaires à Laravel.
+# composer install → installe tes dépendances (Laravel, Pest, etc.) comme en local.
+# .env + key:generate → Laravel a besoin d'un fichier .env et d'une clé d'appli pour tourner, même en CI.
+# php artisan test → lance ta suite de tests (Pest ou PHPUnit, artisan test fonctionne avec les deux).
