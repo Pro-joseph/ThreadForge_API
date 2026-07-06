@@ -6,12 +6,12 @@ use App\Models\GeneratedPost;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Queue\SerializesModels;
 use function Laravel\Ai\agent;
 
 class RepurposeContentJob implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, SerializesModels;
 
     public int $tries = 3;
     public int $backoff = 30;
