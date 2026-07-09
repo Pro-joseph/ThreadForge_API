@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Hash;
 /**
  * @group Authentication
  *
- * Endpoints for registering, logging in, and logging out.
+ * Endpoints for registering, logging in, and logging  out.
  */
 class AuthController extends Controller
 {
