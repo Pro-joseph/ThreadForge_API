@@ -2,6 +2,8 @@
 
 RESTful API that transforms raw developer notes into social media posts via Groq AI. Built with Laravel 13, Sanctum auth, async queue processing, and a Ghostwriter chat agent.
 
+**Deployed API**: `http://20.243.176.179`
+
 ## Prerequisites
 
 - Docker & Docker Compose
@@ -36,13 +38,11 @@ docker exec threadforge_app php artisan scribe:generate
 ## What's Running
 
 | Container | Port | Purpose |
-|---|---|---|
+|---|---|---|---|
 | `threadforge_app` | — | PHP-FPM (API) |
 | `threadforge_nginx` | 8000 | Web server |
 | `threadforge_queue` | — | Queue worker (Redis) |
-| `threadforge_mysql` | 3307 | Database |
 | `threadforge_redis` | 6379 | Queue driver |
-| `threadforge_webgrind` | 8080 | Xdebug profile viewer |
 
 ## API Endpoints
 
@@ -98,6 +98,18 @@ curl http://localhost:8000/api/posts \
   -H "Accept: application/json"
 ```
 
+## Tests
+
+Tests use Pest with SQLite in-memory database. No external services needed.
+
+```bash
+# Run locally (no Docker required)
+php artisan test
+
+# Run inside a container
+docker exec threadforge_app php artisan test
+```
+
 ## Development Tools
 
 | Tool | URL | Description |
@@ -123,9 +135,6 @@ docker exec threadforge_app php artisan migrate
 # Clear opcache on app or queue
 docker exec threadforge_app php -r "opcache_reset();"
 docker exec threadforge_queue php -r "opcache_reset();"
-
-# Run tests (SQLite :memory:)
-docker exec threadforge_app php artisan test
 
 # View logs (Laravel Pail)
 docker exec threadforge_app php artisan pail
