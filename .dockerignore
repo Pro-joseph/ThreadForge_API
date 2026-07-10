@@ -2,8 +2,7 @@
 .gitignore
 .gitattributes
 .env
-.env.example
-.vscode
+# .env.example is needed 
 .idea
 node_modules
 vendor

@@ -2,96 +2,76 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: threadforge_app
+    container_name: threadforge-app
     restart: unless-stopped
-    volumes:
-      - .:/var/www
+    working_dir: /var/www
     environment:
-      - DB_HOST=mysql
-      - REDIS_HOST=redis
-      - QUEUE_CONNECTION=redis
-    depends_on:
-      - mysql
-      - redis
-    networks:
-      - threadforge
-
-  nginx:
-    image: nginx:stable-alpine
-    container_name: threadforge_nginx
-    restart: unless-stopped
-    ports:
-      - "8000:80"
+      APP_ENV: local
+      APP_DEBUG: "true"
+      DB_CONNECTION: sqlite
+      QUEUE_CONNECTION: redis
+      CACHE_STORE: redis
+      REDIS_HOST: redis
+      GROQ_API_KEY: ${GROQ_API_KEY}
     volumes:
-      - .:/var/www
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - threadforge-storage:/var/www/storage
+      - threadforge-db:/var/www/database
     depends_on:
-      - app
+      redis:
+        condition: service_started
     networks:
       - threadforge
 
   queue:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: threadforge_queue
+    build: .
+    container_name: threadforge-queue
     restart: unless-stopped
-    command: php artisan queue:work redis --queue=default --tries=3 --sleep=2
-    volumes:
-      - .:/var/www
+    working_dir: /var/www
+    command: php artisan queue:listen --tries=3 --timeout=0
     environment:
-      - DB_HOST=mysql
-      - REDIS_HOST=redis
-      - QUEUE_CONNECTION=redis
+      APP_ENV: local
+      APP_DEBUG: "true"
+      DB_CONNECTION: sqlite
+      QUEUE_CONNECTION: redis
+      CACHE_STORE: redis
+      REDIS_HOST: redis
+      GROQ_API_KEY: ${GROQ_API_KEY}
+    volumes:
+      - threadforge-storage:/var/www/storage
+      - threadforge-db:/var/www/database
     depends_on:
-      - mysql
-      - redis
-      - app
+      redis:
+        condition: service_started
     networks:
       - threadforge
 
-  mysql:
-    image: mysql:8.4
-    container_name: threadforge_mysql
+  nginx:
+    image: nginx:alpine
+    container_name: threadforge-nginx
     restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: threadforge
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: threadforge
-      MYSQL_PASSWORD: secret
     ports:
-      - "3307:3306"
+      - "80:80"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./public:/var/www/public
+    depends_on:
+      - app
     networks:
       - threadforge
 
   redis:
     image: redis:alpine
-    container_name: threadforge_redis
+    container_name: threadforge-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
     networks:
       - threadforge
 
-  webgrind:
-    build:
-      context: .
-      dockerfile: docker/webgrind/Dockerfile
-    container_name: threadforge_webgrind
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./storage/logs:/var/www/storage/logs:ro
-    networks:
-      - threadforge
+volumes:
+  threadforge-storage:
+  threadforge-db:
 
 networks:
   threadforge:
     driver: bridge
-
-volumes:
-  mysql_data:

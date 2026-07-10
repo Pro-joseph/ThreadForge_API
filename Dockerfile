@@ -2,32 +2,35 @@ FROM php:8.4-fpm
 
 WORKDIR /var/www
 
-# System dependencies
 RUN apt-get update && apt-get install -y \
-    git \
     curl \
     unzip \
-    libzip-dev \
-    libpng-dev \
+    libsqlite3-dev \
     libonig-dev \
-    libxml2-dev \
+    libzip-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# PHP extensions (pdo_mysql for DB, redis for queues, zip/gd for general use)
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
-RUN pecl install redis xdebug && docker-php-ext-enable redis && rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN docker-php-ext-install pdo_sqlite mbstring zip
 
-# Composer
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# Xdebug config
-COPY docker/php/*.ini /usr/local/etc/php/conf.d/
+COPY composer.json composer.lock ./
+RUN composer install \
+    --optimize-autoloader \
+    --no-interaction \
+    --no-progress \
+    --no-dev \
+    --no-scripts
 
 COPY . .
 
-RUN composer install --optimize-autoloader --no-interaction --no-progress
+RUN mkdir -p storage/framework/{cache,sessions,testing,views} \
+    storage/logs \
+    bootstrap/cache
 
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 EXPOSE 9000
+
 CMD ["php-fpm"]
