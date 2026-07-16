@@ -1,0 +1,76 @@
+services:
+  app:
+    image: joseph0070/threadfor-api:app-latest
+    container_name: threadforge-app
+    restart: unless-stopped
+    working_dir: /var/www
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      DB_CONNECTION: sqlite
+      QUEUE_CONNECTION: redis
+      CACHE_STORE: redis
+      REDIS_HOST: redis
+      GROQ_API_KEY: ${GROQ_API_KEY}
+    volumes:
+      - threadforge-storage:/var/www/storage
+      - threadforge-db:/var/www/database
+    depends_on:
+      redis:
+        condition: service_started
+    networks:
+      - threadforge
+
+  queue:
+    image: joseph0070/threadfor-api:queue-latest
+    container_name: threadforge-queue
+    restart: unless-stopped
+    working_dir: /var/www
+    command: php artisan queue:listen --tries=3 --timeout=0
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      DB_CONNECTION: sqlite
+      QUEUE_CONNECTION: redis
+      CACHE_STORE: redis
+      REDIS_HOST: redis
+      GROQ_API_KEY: ${GROQ_API_KEY}
+    volumes:
+      - threadforge-storage:/var/www/storage
+      - threadforge-db:/var/www/database
+    depends_on:
+      redis:
+        condition: service_started
+    networks:
+      - threadforge
+
+  nginx:
+    image: nginx:alpine
+    container_name: threadforge-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./public:/var/www/public
+    depends_on:
+      - app
+    networks:
+      - threadforge
+
+  redis:
+    image: redis:alpine
+    container_name: threadforge-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - threadforge
+
+volumes:
+  threadforge-storage:
+  threadforge-db:
+
+networks:
+  threadforge:
+    driver: bridge

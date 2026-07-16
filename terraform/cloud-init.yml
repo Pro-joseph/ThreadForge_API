@@ -1,0 +1,11 @@
+#cloud-config
+package_update: true
+packages:
+  - docker.io
+  - docker-compose-v2
+
+runcmd:
+  - git clone https://github.com/Pro-joseph/ThreadForge_API.git /opt/threadforge
+  - cd /opt/threadforge && echo "GROQ_API_KEY=${groq_api_key}" > .env
+  - cd /opt/threadforge && docker compose -f docker-compose.prod.yml pull
+  - cd /opt/threadforge && docker compose -f docker-compose.prod.yml up -d
