@@ -78,6 +78,7 @@ jobs:
           NIC_ID="/subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Network/networkInterfaces/threadforge-nic"
           NSG_ID="/subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Network/networkSecurityGroups/threadforge-nsg"
           terraform import $VARS azurerm_network_interface_security_group_association.nsg_assoc "${NIC_ID}|${NSG_ID}" || true
+          terraform import $VARS azurerm_linux_virtual_machine.vm /subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Compute/virtualMachines/threadforge-vm || true
 
       - working-directory: terraform
         env:
