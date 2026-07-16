@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
     libonig-dev \
     libzip-dev \
-    && docker-php-ext-configure zip --with-libzip \
     && docker-php-ext-install pdo_sqlite mbstring zip \
     && pecl install redis && docker-php-ext-enable redis \
     && rm -rf /var/lib/apt/lists/*
