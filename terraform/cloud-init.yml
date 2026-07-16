@@ -7,5 +7,7 @@ packages:
 runcmd:
   - git clone https://github.com/Pro-joseph/ThreadForge_API.git /opt/threadforge
   - cd /opt/threadforge && echo "GROQ_API_KEY=${groq_api_key}" > .env
+  - systemctl stop nginx || true
+  - systemctl disable nginx || true
   - cd /opt/threadforge && docker compose -f docker-compose.prod.yml pull || true
   - cd /opt/threadforge && docker compose -f docker-compose.prod.yml up -d
