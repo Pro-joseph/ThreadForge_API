@@ -27,4 +27,5 @@ variable "groq_api_key" {
   type        = string
   description = "Groq API key for AI processing"
   sensitive   = true
+  default     = ""
 }
