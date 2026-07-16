@@ -36,7 +36,7 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-        run: terraform apply -auto-approve -var "ssh_public_key_path=../id_ed25519.pub"
+        run: terraform apply -auto-approve -var "ssh_public_key_path=../terraform/id_ed25519.pub"
       - id: vmip
         working-directory: terraform
         run: echo "ip=$(terraform output -raw public_ip)" >> $GITHUB_OUTPUT
