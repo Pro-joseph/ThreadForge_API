@@ -65,10 +65,19 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-        run: terraform import \
-              -var "groq_api_key=${{ secrets.GROQ_API_KEY }}" \
-              -var "ssh_public_key_path=./id_ed25519.pub" \
-              azurerm_resource_group.rg /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/threadforge-rga || true
+          RG: threadforge-rgaz
+          SUB: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        run: |
+          VARS="-var groq_api_key=${{ secrets.GROQ_API_KEY }} -var ssh_public_key_path=./id_ed25519.pub"
+          terraform import $VARS azurerm_resource_group.rg /subscriptions/$SUB/resourceGroups/$RG || true
+          terraform import $VARS azurerm_public_ip.public_ip /subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Network/publicIPAddresses/threadforge-vm-ip || true
+          terraform import $VARS azurerm_network_security_group.nsg /subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Network/networkSecurityGroups/threadforge-nsg || true
+          terraform import $VARS azurerm_virtual_network.vnet /subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Network/virtualNetworks/threadforge-vnet || true
+          terraform import $VARS azurerm_subnet.subnet /subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Network/virtualNetworks/threadforge-vnet/subnets/threadforge-subnet || true
+          terraform import $VARS azurerm_network_interface.nic /subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Network/networkInterfaces/threadforge-nic || true
+          NIC_ID="/subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Network/networkInterfaces/threadforge-nic"
+          NSG_ID="/subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Network/networkSecurityGroups/threadforge-nsg"
+          terraform import $VARS azurerm_network_interface_security_group_association.nsg_assoc "${NIC_ID}|${NSG_ID}" || true
 
       - working-directory: terraform
         env:
