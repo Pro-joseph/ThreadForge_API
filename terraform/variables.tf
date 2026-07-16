@@ -10,7 +10,7 @@ variable "resource_group_name" {
 
 variable "location" {
   type    = string
-  default = "West Europe"
+  default = "Japan East"
 }
 
 variable "vm_size" {
