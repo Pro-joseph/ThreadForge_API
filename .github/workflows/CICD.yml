@@ -105,6 +105,15 @@ jobs:
           username: azureuser
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            command -v docker >/dev/null 2>&1 || {
+              sudo apt-get update
+              sudo apt-get install -y docker.io docker-compose-v2
+              sudo usermod -aG docker azureuser
+            }
+            [ -d /opt/threadforge ] || {
+              sudo mkdir -p /opt/threadforge
+              sudo git clone https://github.com/Pro-joseph/ThreadForge_API.git /opt/threadforge
+            }
             cd /opt/threadforge
-            docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d
+            sudo docker compose -f docker-compose.prod.yml pull || true
+            sudo docker compose -f docker-compose.prod.yml up -d
