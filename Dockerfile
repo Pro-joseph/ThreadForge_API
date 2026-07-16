@@ -5,31 +5,27 @@ WORKDIR /var/www
 RUN apt-get update && apt-get install -y \
     curl \
     unzip \
+    git \
     libsqlite3-dev \
     libonig-dev \
     libzip-dev \
+    && docker-php-ext-configure zip --with-libzip \
+    && docker-php-ext-install pdo_sqlite mbstring zip \
     && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install pdo_sqlite mbstring zip
+# install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN pecl install redis \
-    && docker-php-ext-enable redis
-
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# copy only composer files first for layer caching
 COPY composer.json composer.lock ./
 RUN composer install \
     --optimize-autoloader \
     --no-interaction \
     --no-progress \
-    --no-dev \
-    --no-scripts
+    --no-dev
 
+# copy application
 COPY . .
-
-RUN mkdir -p storage/framework/{cache,sessions,testing,views} \
-    storage/logs \
-    bootstrap/cache
-
 
 EXPOSE 9000
 

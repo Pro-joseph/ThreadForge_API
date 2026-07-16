@@ -17,7 +17,6 @@ public/storage
 .DS_Store
 Thumbs.db
 docker-compose.yml
-Dockerfile
 .dockerignore
 *.md
 npm-debug.log
