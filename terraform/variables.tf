@@ -5,7 +5,7 @@ variable "ssh_public_key_path" {
 
 variable "resource_group_name" {
   type    = string
-  default = "threadforge-rga" 
+  default = "threadforge-rgaz" 
 }
 
 variable "location" {
