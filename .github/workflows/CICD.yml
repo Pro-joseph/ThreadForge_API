@@ -15,7 +15,7 @@ jobs:
           php-version: '8.4'
           extensions: mbstring, pdo_sqlite, zip
       - run: composer install --no-interaction --no-progress
-      - run: vendor/bin/phpunit
+      - run: ./vendor/bin/pest 
 
   terraform:
     needs: test
