@@ -127,3 +127,18 @@ jobs:
           script: |
             sudo docker ps -a
             sudo docker compose -f /opt/threadforge/docker-compose.prod.yml logs --tail=50      
+      - name: Full diagnostic
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ needs.terraform.outputs.vm_ip }}
+          username: azureuser
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "--- ufw ---"
+            sudo ufw status verbose 2>&1 || echo "ufw not available"
+            echo "--- listening ports ---"
+            sudo ss -tlnp
+            echo "--- curl localhost ---"
+            curl -sv http://localhost:80 2>&1 | head -30
+            echo "--- iptables ---"
+            sudo iptables -L -n | head -30      
