@@ -114,6 +114,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             command -v docker >/dev/null 2>&1 || {
+              while sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do sleep 2; done
               curl -fsSL https://get.docker.com | sudo sh
               sudo usermod -aG docker azureuser
             }
