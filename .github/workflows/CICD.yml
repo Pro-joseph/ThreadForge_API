@@ -114,8 +114,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             command -v docker >/dev/null 2>&1 || {
-              sudo apt-get update
-              sudo apt-get install -y docker.io docker-compose-v2
+              curl -fsSL https://get.docker.com | sudo sh
               sudo usermod -aG docker azureuser
             }
             [ -d /opt/threadforge ] || {
