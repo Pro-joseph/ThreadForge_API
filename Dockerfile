@@ -25,12 +25,10 @@ COPY . .
 
 RUN mkdir -p storage/framework/{cache,sessions,testing,views} \
     storage/logs bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache
+    && chown -R www-data:www-data /var/www
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
-USER www-data
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]

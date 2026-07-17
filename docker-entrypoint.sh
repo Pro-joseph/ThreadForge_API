@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
 
+chown -R www-data:www-data /var/www/storage /var/www/database 2>/dev/null || true
+
+composer dump-autoload --no-interaction 2>/dev/null || true
+
 if [ ! -f .env ]; then
     echo "Copying .env.example to .env..."
     cp .env.example .env

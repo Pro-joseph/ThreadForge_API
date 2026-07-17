@@ -28,4 +28,4 @@ Homestead.yaml
 Thumbs.db
 .terraform
 .tfstate
-.pub
+.pubconfig/scribe.php
