@@ -118,3 +118,12 @@ jobs:
             cd /opt/threadforge
             sudo docker compose -f docker-compose.prod.yml pull || true
             sudo docker compose -f docker-compose.prod.yml up -d
+      - name: Debug — check running containers
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ needs.terraform.outputs.vm_ip }}
+          username: azureuser
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo docker ps -a
+            sudo docker compose -f /opt/threadforge/docker-compose.prod.yml logs --tail=50      
