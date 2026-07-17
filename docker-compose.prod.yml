@@ -45,13 +45,12 @@ services:
       - threadforge
 
   nginx:
-    image: nginx:alpine
+    image: joseph0070/threadfor-api:nginx-latest
     container_name: threadforge-nginx
     restart: unless-stopped
     ports:
       - "80:80"
     volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./public:/var/www/public
     depends_on:
       - app

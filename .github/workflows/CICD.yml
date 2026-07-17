@@ -31,7 +31,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push images
+      - name: Build and push app & queue
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -40,6 +40,13 @@ jobs:
             joseph0070/threadfor-api:app-latest
             joseph0070/threadfor-api:queue-latest
             joseph0070/threadfor-api:${{ github.sha }}
+
+      - name: Build and push nginx
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/nginx
+          push: true
+          tags: joseph0070/threadfor-api:nginx-latest
 
   terraform:
     needs: [test, build-and-push]
