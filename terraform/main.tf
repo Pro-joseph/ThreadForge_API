@@ -91,6 +91,10 @@ resource "azurerm_linux_virtual_machine" "vm" {
     groq_api_key = var.groq_api_key
   }))
 
+  lifecycle {
+    ignore_changes = [custom_data]
+  }
+
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
