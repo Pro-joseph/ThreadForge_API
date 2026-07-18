@@ -114,6 +114,21 @@ jobs:
             -var "ssh_public_key_path=./id_ed25519.pub" \
             -var "groq_api_key=${{ secrets.GROQ_API_KEY }}"
 
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: |
+            {
+              "clientId": "${{ secrets.ARM_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.ARM_CLIENT_SECRET }}",
+              "tenantId": "${{ secrets.ARM_TENANT_ID }}",
+              "subscriptionId": "${{ secrets.ARM_SUBSCRIPTION_ID }}"
+            }
+
+      - name: Ensure Azure VM is started
+        run: |
+          az vm start --resource-group threadforge-rgaz --name threadforge-vm
+
       - id: vmip
         working-directory: terraform
         run: echo "ip=$(terraform output -raw public_ip)" >> $GITHUB_OUTPUT
