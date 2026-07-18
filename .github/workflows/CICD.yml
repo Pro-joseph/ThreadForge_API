@@ -122,6 +122,20 @@ jobs:
     needs: [terraform, build-and-push]
     runs-on: ubuntu-latest
     steps:
+      - name: Wait for SSH to become available
+        run: |
+          host=${{ needs.terraform.outputs.vm_ip }}
+          for i in $(seq 1 30); do
+            if bash -c "</dev/tcp/$host/22" >/dev/null 2>&1; then
+              echo "SSH ready on $host:22"
+              exit 0
+            fi
+            echo "Waiting for SSH on $host:22 (attempt $i/30)..."
+            sleep 10
+          done
+          echo "SSH did not become available on $host:22"
+          exit 1
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
